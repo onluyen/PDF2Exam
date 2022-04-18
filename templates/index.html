@@ -1,0 +1,100 @@
+<html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+<body>
+    {% if question_content|length != 0%}
+    <nav class="sticky">
+        <ul class="list-inline">
+        <a href="#pdf-heading">Upload</a>
+        <a href="#question-heading">Questions</a>
+        <a href="#correct-heading">Correct Answers</a>
+        <a href="#explain-heading">Explanation</a>
+	</ul>
+    </nav>
+    {% endif %}
+    <h1 class="title" id = "pdf-heading">PDF2Exam</h1>
+    <div class="container">
+        <div class="content-flex">
+            <div class = "wrap-form">
+                <form action="http://localhost:5000/" method="POST" enctype="multipart/form-data" class = "upload-form">
+
+                    <input type = "file" name = "file" class = "file-upload" id = "file-upload" accept=".pdf" >
+                    <input type = "submit" id = "submit"incr class = "submit" onclick="submit_click()"/>
+                </form>
+            </div>
+            <div id="loading"></div>
+
+            <div id = "display-content">
+                <div id = "question">
+                    {% if question_content|length != 0%}
+                        <h2 id = "question-heading">Questions and Answer Options</h2>
+                    {% endif %}
+    
+                    {% for key, value in question_content.items() %}
+                        <!--- Display question title --->
+                        <div class = "question-content">
+                        <img src="{{question_title[key][0]}}">
+                        </div>
+                        
+                        <!--- Display question content --->
+                        {% for v in value %}
+                            <div><img src="{{v}}"></div>
+                        {% endfor %}
+                        <div class="wrap-answer">
+                        <!--- Display answer title and answer content --->
+                        {% for a in range(0, answer_title[key]|length) %}
+                            <div class = "answer">
+                                <div class="title"><img src="{{answer_title[key][a]}}"></div>
+                                <div class = "answer-content">
+                                    <img src="{{answer_content[key][a]}}">
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            
+                <div id = "correct-answers">
+                    {% if correct_answers|length > 1%}
+                        <h2 id = "correct-heading">Correct Answers</h2>
+                    {% endif %}
+                    
+                    {% if correct_answers|length != 0%}
+                        <table class="correct-table">
+                            <tbody>
+                                {% set rows =  (correct_answers|length / 5)|round|int %}
+                                {%set index = namespace(value=1)  %}
+    
+                                {% for row in range(rows) %}
+                                    <tr>
+                                        {% for col in range(5) %}
+                                            <td>{{index.value}} {{correct_answers[index.value]}}</td>
+                                            {% set index.value = index.value + 1 %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+    
+                <div id = "explain">
+                    {% if explain_list|length != 0%}
+                        <h2 id = "explain-heading">Explanation</h2>
+                    {% endif %}
+                    
+                    {% for key, value in explain_list.items() %}
+                        <div class="wrap-explain">
+                            {% for a in range(0, value|length) %}
+                                <img src="{{value[a]}}"> <br>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </body>
+</html>
